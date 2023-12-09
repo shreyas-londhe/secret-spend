@@ -19,6 +19,23 @@ const (
 	numUsers int = 1 << depth
 )
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000") // Allow only your client app to access
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")   // Allowed methods
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")         // Allowed headers
+
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			return
+		}
+
+		// Call the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
 func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Assuming you have a global variable 'database' of type *db.DB
 	users := database.GetAllUsers()
@@ -112,6 +129,10 @@ func transferFundsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	router := http.NewServeMux()
+
+	handlerWithCors := corsMiddleware(router)
+
 	database = db.New()
 
 	users := db.GenerateData(numUsers)
@@ -122,21 +143,21 @@ func main() {
 	tree := db.GenerateTreeFromUserData(users)
 	database.StoreMerkleTree(&tree)
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		allUsers := database.GetAllUsers()
 		for _, user := range allUsers {
 			fmt.Fprintf(w, "User Index: %d, Balance: %s\n", user.Index, user.Balance.String())
 		}
 	})
 
-	http.HandleFunc("/get-all-users", getAllUsersHandler)
+	router.HandleFunc("/get-all-users", getAllUsersHandler)
 
-	http.HandleFunc("/get-merkle-root", getMerkleRootHandler)
+	router.HandleFunc("/get-merkle-root", getMerkleRootHandler)
 
-	http.HandleFunc("/transfer-funds", transferFundsHandler)
+	router.HandleFunc("/transfer-funds", transferFundsHandler)
 
 	log.Println("Starting server on port 8080...")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", handlerWithCors); err != nil {
 		log.Fatal("ListenAndServe error: ", err)
 	}
 }

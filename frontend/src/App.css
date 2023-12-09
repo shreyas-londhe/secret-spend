@@ -1,0 +1,105 @@
+.main-app {
+    text-align: center;
+    margin: 100px;
+}
+
+.cta-button {
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    min-width: 250px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.connect-wallet-button {
+    background: rgb(32, 129, 226);
+}
+
+.transfer-button {
+    background: orange;
+}
+
+.form-container {
+    text-align: left;
+    margin: 50px auto;
+    width: fit-content;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.submit-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    background: rgb(195, 39, 34);
+    margin-top: 10px;
+}
+
+/* Adjust the focus state for inputs */
+.form-input:focus {
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
+}
+
+.toast {
+    padding: 10px;
+    color: white;
+    background-color: #5cb85c; /* Success color */
+    border-radius: 5px;
+    position: fixed; /* To show the toast above other content */
+    top: 20px; /* Position from top */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for exact centering */
+    z-index: 1000; /* Make sure it's above other elements */
+    animation: fadein 0.5s, fadeout 0.5s 2.5s; /* Fade in and out */
+}
+
+@keyframes fadein {
+    from {
+        top: 0;
+        opacity: 0;
+    }
+    to {
+        top: 20px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        top: 20px;
+        opacity: 1;
+    }
+    to {
+        top: 0;
+        opacity: 0;
+    }
+}

@@ -138,7 +138,6 @@ func GenerateTransferWitness(
 
 	// For leaf fromIndex
 	leaf0 := users[fromIndex]
-	fmt.Println("old leaf0", leaf0)
 	content0 := convertToLeaf(leaf0)
 	proof0, proofHelper0, err := tree.GetMerklePath(content0)
 	if err != nil {
@@ -175,7 +174,6 @@ func GenerateTransferWitness(
 
 	// For leaf toIndex
 	leaf1 := users[toIndex]
-	fmt.Println("old leaf1", leaf1)
 	content1 := convertToLeaf(leaf1)
 	proof1, proofHelper1, err := tree.GetMerklePath(content1)
 	if err != nil {
@@ -310,9 +308,6 @@ func GenerateTransferWitness(
 		witness.NewToLeafMP.Path[i] = newProof1[i-1]
 	}
 	witness.NewToLeafMPHelper = newProofHelper1
-
-	fmt.Println("new leaf0", leaf0)
-	fmt.Println("new leaf1", leaf1)
 
 	return witness, pubInputs, leaf0, leaf1, tree, nil
 }

@@ -42,11 +42,25 @@ function App() {
         }
     };
 
+    // const fetchData = async () => {
+    //     try {
+    //         const response = await fetch("YOUR_API_ENDPOINT");
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP error! status: ${response.status}`);
+    //         }
+    //         const data = await response.json();
+    //         setApiData(data); // Update state with the API data
+    //     } catch (error) {
+    //         console.error("Error fetching data:", error);
+    //         // Handle the error appropriately
+    //     }
+    // };
+
     const proveAndTransferHandler = async (e) => {
         e.preventDefault();
 
         try {
-            setShowToast("Generating Proof");
+            setShowToast({ message: "Generating Proof" });
             setTimeout(() => setShowToast(""), 3000);
 
             const fromIndex = 0;
@@ -68,7 +82,7 @@ function App() {
             const data = await response.json();
             console.log("Response:", data);
 
-            setShowToast("Proof Generated");
+            setShowToast({ message: "Proof Generated", type: "success" });
             setTimeout(() => setShowToast(""), 3000);
 
             if (window.ethereum && currentAccount) {
@@ -94,13 +108,15 @@ function App() {
                 console.log("Transaction successful:", tx);
 
                 // Show success toast
-                setShowToast("Transfer Successful");
+                setShowToast({
+                    message: "Transfer Successful",
+                    type: "success",
+                });
                 setTimeout(() => setShowToast(""), 3000);
             } else {
                 console.log(
                     "Ethereum object not found or no account connected"
                 );
-                // Handle error (e.g., show error toast)
             }
         } catch (error) {
             console.error("An error occurred during form submission:", error);
@@ -117,6 +133,12 @@ function App() {
             </button>
         );
     };
+
+    function determineToastClass(toast) {
+        if (toast.type === "success") return "bg-success text-white";
+        if (toast.type === "error") return "bg-danger text-white";
+        return "bg-primary text-white"; // Default class
+    }
 
     const transferForm = () => {
         const handleReceiverIDChange = (e) => {
@@ -136,41 +158,78 @@ function App() {
                 !isNaN(amount)
             );
         };
-
         return (
-            <div className="form-container">
-                {showToast && <div className="toast">{showToast}</div>}
-                <form onSubmit={proveAndTransferHandler}>
-                    <div className="form-row">
-                        <label className="form-label">ReceiverID:</label>
-                        <input
-                            type="number"
-                            value={receiverID}
-                            onChange={handleReceiverIDChange}
-                            className="form-input"
-                            min="0"
-                            max="31"
-                        />
-                    </div>
-
-                    <div className="form-row">
-                        <label className="form-label">Amount:</label>
-                        <input
-                            type="number"
-                            value={amount}
-                            onChange={handleAmountChange}
-                            className="form-input"
-                            min="1"
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        className="submit-button"
-                        disabled={!isFormValid()}
+            <div className="container mt-5">
+                {showToast && (
+                    <div
+                        style={{
+                            position: "fixed",
+                            bottom: "20px",
+                            right: "20px",
+                            zIndex: 1050,
+                        }}
                     >
-                        Prove & Transfer
-                    </button>
-                </form>
+                        <div
+                            className={`toast show ${determineToastClass(
+                                showToast
+                            )}`}
+                            role="alert"
+                            aria-live="assertive"
+                            aria-atomic="true"
+                        >
+                            <div className="toast-header">
+                                <strong className="me-auto">
+                                    Notification
+                                </strong>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowToast("")}
+                                    aria-label="Close"
+                                ></button>
+                            </div>
+                            <div className="toast-body">
+                                {showToast.message}
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <div className="row justify-content-center">
+                    <div className="col-md-4">
+                        <form onSubmit={proveAndTransferHandler}>
+                            <div className="form-group">
+                                <label>ReceiverID:</label>
+                                <input
+                                    type="number"
+                                    value={receiverID}
+                                    onChange={handleReceiverIDChange}
+                                    className="form-control"
+                                    min="0"
+                                    max="31"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Amount:</label>
+                                <input
+                                    type="number"
+                                    value={amount}
+                                    onChange={handleAmountChange}
+                                    className="form-control"
+                                    min="1"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="btn btn-primary btn-block"
+                                disabled={!isFormValid()}
+                            >
+                                Prove & Transfer
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         );
     };
@@ -180,9 +239,41 @@ function App() {
     }, []);
 
     return (
-        <div className="main-app">
-            <h1>$ecret $pend</h1>
-            <div>{currentAccount ? transferForm() : connectWalletButton()}</div>
+        <div>
+            <div className="main-background"></div>
+            <div className="container my-5">
+                <h1 className="title text-center mb-4">$ecret $pend</h1>
+                <div className="row">
+                    <div className="col-md-8 offset-md-2">
+                        <p className="text-center text-secondary">
+                            <strong>$ecret $pend</strong> combines privacy and
+                            transactions seamlessly. Utilizing Zero Knowledge
+                            Proofs and Additive Homomorphic Encryption, we
+                            redefine financial privacy. Your balance remains
+                            hidden while you transfer funds securely.
+                        </p>
+                        <p className="text-center text-secondary">
+                            Behind our simple interface is a robust
+                            cryptographic system, ensuring each transaction is a
+                            secure, private exchange. Experience the pinnacle of
+                            financial discretion with $ecret $pend.
+                        </p>
+                        <div className="text-center mb-4">
+                            <a
+                                href="https://github.com/shreyas-londhe/secret-spend"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-outline-dark"
+                            >
+                                Check out our GitHub Repository
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div className="d-flex justify-content-center">
+                    {currentAccount ? transferForm() : connectWalletButton()}
+                </div>
+            </div>
         </div>
     );
 }

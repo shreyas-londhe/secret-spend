@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/shreyas-londhe/private-erc20-circuits/db"
+	"github.com/shreyas-londhe/private-erc20-circuits/paillier"
 )
 
 var database *db.DB
@@ -43,14 +44,48 @@ func getAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	var response []db.UserResponse
 	for _, user := range users {
 		response = append(response, db.UserResponse{
-			KeyPair: &user.KeyPair.PublicKey, // Send only the public part
-			Balance: user.Balance.String(),
-			Index:   user.Index,
+			KeyPair:    &user.KeyPair.PublicKey,
+			Balance:    user.Balance.String(),
+			Index:      user.Index,
+			EncBalance: user.EncBalance.String(),
+			EncR:       user.EncR.String(),
 		})
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func getUserHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse request parameters
+	index, err := strconv.Atoi(r.URL.Query().Get("index"))
+	if err != nil {
+		http.Error(w, "Invalid index", http.StatusBadRequest)
+		return
+	}
+
+	user := database.GetUser(index)
+	if user.Balance == nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	type response struct {
+		KeyPair    *paillier.PublicKey `json:"keyPair"`
+		Balance    string              `json:"balance"`
+		EncBalance string              `json:"encBalance"`
+		EncR       string              `json:"encR"`
+	}
+
+	resp := response{
+		KeyPair:    &user.KeyPair.PublicKey,
+		Balance:    user.Balance.String(),
+		EncBalance: user.EncBalance.String(),
+		EncR:       user.EncR.String(),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp)
 }
 
 func getMerkleRootHandler(w http.ResponseWriter, r *http.Request) {
@@ -151,6 +186,8 @@ func main() {
 	})
 
 	router.HandleFunc("/get-all-users", getAllUsersHandler)
+
+	router.HandleFunc("/get-user", getUserHandler)
 
 	router.HandleFunc("/get-merkle-root", getMerkleRootHandler)
 

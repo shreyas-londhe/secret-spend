@@ -1,8 +1,9 @@
 import "./App.css";
 import contracts from "./contracts/SecretSpend.json";
 import { useEffect, useState } from "react";
+import { Contract, ethers, toBigInt } from "ethers";
 
-const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // TODO: update me
+const contractAddress = "0x9AB81C32e1D621404b253c7fE0fC9972d1645E69";
 const contractABI = contracts.abi;
 
 function App() {
@@ -69,6 +70,38 @@ function App() {
 
             setShowToast("Proof Generated");
             setTimeout(() => setShowToast(""), 3000);
+
+            if (window.ethereum && currentAccount) {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+
+                const contract = new Contract(
+                    contractAddress,
+                    contractABI,
+                    signer
+                );
+
+                console.log("Contract object:", contract);
+
+                const zkProof = {
+                    proof: data.proof.map((x) => toBigInt(x)),
+                    input: data.inputs.map((x) => toBigInt(x)),
+                };
+
+                const tx = await contract.transferPrivately(zkProof);
+                await tx.wait();
+
+                console.log("Transaction successful:", tx);
+
+                // Show success toast
+                setShowToast("Transfer Successful");
+                setTimeout(() => setShowToast(""), 3000);
+            } else {
+                console.log(
+                    "Ethereum object not found or no account connected"
+                );
+                // Handle error (e.g., show error toast)
+            }
         } catch (error) {
             console.error("An error occurred during form submission:", error);
         }

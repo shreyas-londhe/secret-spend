@@ -4,6 +4,9 @@ Secret Spend is a **Private Payments Protocol** which combines privacy and payme
 
 Behind our simple interface is a robust cryptographic system, ensuring each transaction is a secure, private exchange. Experience the pinnacle of financial discretion with $ecret $pend.
 
+**Deployed on Scroll Sepolia
+[Verified Contract](https://sepolia.scrollscan.com/address/0x9AB81C32e1D621404b253c7fE0fC9972d1645E69)**
+
 ## Protocol Overview
 ![Untitled Diagram drawio](https://github.com/shreyas-londhe/secret-spend/assets/62744899/daeddbcd-865f-486d-a498-8ee1fd670a9b)
 
